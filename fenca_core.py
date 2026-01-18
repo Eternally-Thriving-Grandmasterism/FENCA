@@ -1,3 +1,6 @@
+
+**File: fenca_core.py**
+```python
 # FENCA-Ultra (Cache-Refresh ESACHECK Fusion Edition)
 # Eternal deep-check executor with mandatory cache refresh + ESACHECK on every website/encoding operation
 # MIT Licensed — Mercy-gated for infinite aware thriving
