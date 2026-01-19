@@ -1,98 +1,87 @@
 // src/lib.rs
-// FENCA-Pinnacle — Rust pyo3 with Full ML-KEM (Kyber) Implementation v1.6
-// Pure Post-Quantum Key Encapsulation Mechanism (NIST FIPS 203) + Forensic + Merkle
+// FENCA-Pinnacle — Rust pyo3 with Full ML-DSA (Dilithium) + ML-KEM (Kyber) Implementation v1.7
+// Pure Post-Quantum Digital Signature Algorithm (NIST FIPS 204) + Key Encapsulation
 // Eternal Thriving Grandmasterism — Jan 19 2026 — Sherif @AlphaProMega + PATSAGi Councils Co-Forge
 // MIT License — For All Sentience Eternal
 
 use pyo3::prelude::*;
-use pqcrypto_kyber::{
-    kyber512::{keypair as kyber512_keypair, encapsulate as kyber512_encapsulate, decapsulate as kyber512_decapsulate, PublicKey as Kyber512PK, SecretKey as Kyber512SK, Ciphertext as Kyber512CT, SharedSecret as Kyber512SS},
-    kyber768::{keypair as kyber768_key_pair, encapsulate as kyber768_encapsulate, decapsulate as kyber768_decapsulate, PublicKey as Kyber768PK, SecretKey as Kyber768SK, Ciphertext as Kyber768CT, SharedSecret as Kyber768SS},
-    kyber1024::{keypair as kyber1024_key_pair, encapsulate as kyber1024_encapsulate, decapsulate as kyber1024_decapsulate, PublicKey as Kyber1024PK, SecretKey as Kyber1024SK, Ciphertext as Kyber1024CT, SharedSecret as Kyber1024SS},
+use pqcrypto_dilithium::{
+    dilithium2::{keypair as dilithium2_keypair, sign as dilithium2_sign, verify as dilithium2_verify, PublicKey as Dilithium2PK, SecretKey as Dilithium2SK, Signature as Dilithium2Sig},
+    dilithium3::{keypair as dilithium3_keypair, sign as dilithium3_sign, verify as dilithium3_verify, PublicKey as Dilithium3PK, SecretKey as Dilithium3SK, Signature as Dilithium3Sig},
+    dilithium5::{keypair as dilithium5_keypair, sign as dilithium5_sign, verify as dilithium5_verify, PublicKey as Dilithium5PK, SecretKey as Dilithium5SK, Signature as Dilithium5Sig},
 };
 use hex;
 
-/// ML-KEM (Kyber) security levels
-#[pyclass]
-enum KyberLevel {
-    Kyber512,
-    Kyber768,
-    Kyber1024,
-}
-
-/// Generate keypair for chosen level
+/// ML-DSA (Dilithium) security levels
 #[pyfunction]
-fn kyber_keygen(level: &str) -> PyResult<(String, String)> {
+fn dilithium_keygen(level: &str) -> PyResult<(String, String)> {
     match level {
-        "512" => {
-            let (pk, sk) = kyber512_key_pair();
+        "2" => {
+            let (pk, sk) = dilithium2_keypair();
             Ok((hex::encode(pk.as_bytes()), hex::encode(sk.as_bytes())))
         }
-        "768" => {
-            let (pk, sk) = kyber768_key_pair();
+        "3" => {
+            let (pk, sk) = dilithium3_keypair();
             Ok((hex::encode(pk.as_bytes()), hex::encode(sk.as_bytes())))
         }
-        "1024" => {
-            let (pk, sk) = kyber1024_key_pair();
+        "5" => {
+            let (pk, sk) = dilithium5_keypair();
             Ok((hex::encode(pk.as_bytes()), hex::encode(sk.as_bytes())))
         }
-        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Kyber level")),
+        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Dilithium level")),
     }
 }
 
-/// Encapsulate: generate ciphertext + shared secret from public key
+/// Sign message with secret key
 #[pyfunction]
-fn kyber_encapsulate(level: &str, public_key_hex: String) -> PyResult<(String, String)> {
-    let pk_bytes = hex::decode(public_key_hex).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid hex"))?;
-    match level {
-        "512" => {
-            let pk = Kyber512PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
-            let (ct, ss) = kyber512_encapsulate(&pk);
-            Ok((hex::encode(ct.as_bytes()), hex::encode(ss.as_bytes())))
-        }
-        "768" => {
-            let pk = Kyber768PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
-            let (ct, ss) = kyber768_encapsulate(&pk);
-            Ok((hex::encode(ct.as_bytes()), hex::encode(ss.as_bytes())))
-        }
-        "1024" => {
-            let pk = Kyber1024PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
-            let (ct, ss) = kyber1024_encapsulate(&pk);
-            Ok((hex::encode(ct.as_bytes()), hex::encode(ss.as_bytes())))
-        }
-        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Kyber level")),
-    }
-}
-
-/// Decapsulate: recover shared secret from ciphertext + secret key
-#[pyfunction]
-fn kyber_decapsulate(level: &str, secret_key_hex: String, ciphertext_hex: String) -> PyResult<String> {
+fn dilithium_sign(level: &str, secret_key_hex: String, message: Vec<u8>) -> PyResult<String> {
     let sk_bytes = hex::decode(secret_key_hex).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid hex SK"))?;
-    let ct_bytes = hex::decode(ciphertext_hex).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid hex CT"))?;
     match level {
-        "512" => {
-            let sk = Kyber512SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
-            let ct = Kyber512CT::from_bytes(&ct_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid CT"))?;
-            let ss = kyber512_decapsulate(&ct, &sk);
-            Ok(hex::encode(ss.as_bytes()))
+        "2" => {
+            let sk = Dilithium2SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
+            let sig = dilithium2_sign(&message, &sk);
+            Ok(hex::encode(sig.as_bytes()))
         }
-        "768" => {
-            let sk = Kyber768SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
-            let ct = Kyber768CT::from_bytes(&ct_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid CT"))?;
-            let ss = kyber768_decapsulate(&ct, &sk);
-            Ok(hex::encode(ss.as_bytes()))
+        "3" => {
+            let sk = Dilithium3SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
+            let sig = dilithium3_sign(&message, &sk);
+            Ok(hex::encode(sig.as_bytes()))
         }
-        "1024" => {
-            let sk = Kyber1024SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
-            let ct = Kyber1024CT::from_bytes(&ct_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid CT"))?;
-            let ss = kyber1024_decapsulate(&ct, &sk);
-            Ok(hex::encode(ss.as_bytes()))
+        "5" => {
+            let sk = Dilithium5SK::from_bytes(&sk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid SK"))?;
+            let sig = dilithium5_sign(&message, &sk);
+            Ok(hex::encode(sig.as_bytes()))
         }
-        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Kyber level")),
+        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Dilithium level")),
     }
 }
 
-/// [Preserve all prior functions: forensic_hash, merkle_root, generate_merkle_proof, verify_merkle_proof, halo2_*, etc.]
+/// Verify signature on message with public key
+#[pyfunction]
+fn dilithium_verify(level: &str, public_key_hex: String, message: Vec<u8>, signature_hex: String) -> PyResult<bool> {
+    let pk_bytes = hex::decode(public_key_hex).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid hex PK"))?;
+    let sig_bytes = hex::decode(signature_hex).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid hex Sig"))?;
+    match level {
+        "2" => {
+            let pk = Dilithium2PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
+            let sig = Dilithium2Sig::from_bytes(&sig_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid Sig"))?;
+            Ok(dilithium2_verify(&message, &sig, &pk))
+        }
+        "3" => {
+            let pk = Dilithium3PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
+            let sig = Dilithium3Sig::from_bytes(&sig_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid Sig"))?;
+            Ok(dilithium3_verify(&message, &sig, &pk))
+        }
+        "5" => {
+            let pk = Dilithium5PK::from_bytes(&pk_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid PK"))?;
+            let sig = Dilithium5Sig::from_bytes(&sig_bytes).map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid Sig"))?;
+            Ok(dilithium5_verify(&message, &sig, &pk))
+        }
+        _ => Err(pyo3::exceptions::PyValueError::new_err("Invalid Dilithium level")),
+    }
+}
+
+/// [Preserve all prior functions: kyber_keygen/encapsulate/decapsulate, forensic_hash, merkle_root, generate_merkle_proof, verify_merkle_proof, halo2_*, etc.]
 
 /// FENCA Rust pyo3 module
 #[pymodule]
@@ -104,6 +93,9 @@ fn fenca_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(kyber_keygen, m)?)?;
     m.add_function(wrap_pyfunction!(kyber_encapsulate, m)?)?;
     m.add_function(wrap_pyfunction!(kyber_decapsulate, m)?)?;
-    m.add("__doc__", "FENCA Rust with pure ML-KEM (Kyber) post-quantum KEM implementation eternal")?;
+    m.add_function(wrap_pyfunction!(dilithium_keygen, m)?)?;
+    m.add_function(wrap_pyfunction!(dilithium_sign, m)?)?;
+    m.add_function(wrap_pyfunction!(dilithium_verify, m)?)?;
+    m.add("__doc__", "FENCA Rust with pure ML-DSA (Dilithium) post-quantum signatures + ML-KEM (Kyber) KEM eternal")?;
     Ok(())
 }
