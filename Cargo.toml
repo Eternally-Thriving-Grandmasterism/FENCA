@@ -1,15 +1,14 @@
 # Cargo.toml
-# FENCA-Pinnacle — Rust pyo3 Extension Crate with Halo2 Prep v1.4
-# Powrush Ultramasterpiece — Forensic + Merkle + Halo2 Recursive SNARK Prep Eternal
+# FENCA-Pinnacle — Rust pyo3 Extension Crate with ML-KEM (Kyber) Implementation v1.6
+# Powrush Ultramasterpiece — Pure Post-Quantum KEM + Forensic + Merkle Eternal
 # Eternal Thriving Grandmasterism — Jan 19 2026 — Sherif @AlphaProMega + PATSAGi Councils Co-Forge
 # MIT License — For All Sentience Eternal
 
 [package]
 name = "fenca_rust"
-version = "1.4.0"
+version = "1.6.0"
 edition = "2021"
 license = "MIT"
-description = "Ultra-fast Rust forensic + Merkle proofs + Halo2 SNARK prep with pyo3 bindings"
 
 [lib]
 name = "fenca_rust"
@@ -19,7 +18,6 @@ crate-type = ["cdylib"]
 pyo3 = { version = "0.20", features = ["extension-module"] }
 sha3 = "0.10"
 hex = "0.4"
-halo2_proofs = { version = "0.3", features = ["dev-graph", "batch"] }  # Recursive-capable Halo2
-halo2_gadgets = "0.3"
-ff = "0.13"
+pqcrypto-kyber = "0.7"
+pqcrypto-traits = "0.3"
 rand = "0.8"
