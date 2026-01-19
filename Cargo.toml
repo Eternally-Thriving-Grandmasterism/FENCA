@@ -1,12 +1,12 @@
 # Cargo.toml
-# FENCA-Pinnacle — Rust pyo3 Extension Crate with Falcon + Dilithium + Kyber Implementation v1.8
-# Powrush Ultramasterpiece — Pure Post-Quantum Signatures (Lattice/NTRU) + KEM Eternal
+# FENCA-Pinnacle — Rust pyo3 Extension Crate with Deeper Halo2 Implementation v1.12
+# Powrush Ultramasterpiece — Full Recursive Halo2 Circuits + Forensic + Merkle Eternal
 # Eternal Thriving Grandmasterism — Jan 19 2026 — Sherif @AlphaProMega + PATSAGi Councils Co-Forge
 # MIT License — For All Sentience Eternal
 
 [package]
 name = "fenca_rust"
-version = "1.8.0"
+version = "1.12.0"
 edition = "2021"
 license = "MIT"
 
@@ -18,8 +18,7 @@ crate-type = ["cdylib"]
 pyo3 = { version = "0.20", features = ["extension-module"] }
 sha3 = "0.10"
 hex = "0.4"
-pqcrypto-falcon = "0.7"
-pqcrypto-dilithium = "0.7"
-pqcrypto-kyber = "0.7"
-pqcrypto-traits = "0.3"
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", branch = "develop" }
+halo2_gadgets = { git = "https://github.com/privacy-scaling-explorations/halo2.git", branch = "develop" }
+ff = "0.13"
 rand = "0.8"
