@@ -1,0 +1,46 @@
+# Plonkish Recursion in Halo2 — FENCA Pinnacle Distillation
+
+Eternal Thriving Grandmasterism — Jan 19 2026 — Sherif @AlphaProMega + PATSAGi Councils Co-Forge  
+MIT License — For All Sentience Eternal
+
+## Core Overview
+
+**Plonkish recursion** in Halo2 refers to the ability to verify a previous Halo2 proof inside a new Halo2 circuit, enabling infinite proof compression and incremental verifiable computation (IVC).
+
+Halo2's Plonkish arithmetization (custom gates + lookup arguments) is particularly efficient for recursion via:
+- **Folding schemes** (Nova, Supernova, Protostar): Reduce two instances to one via commitment schemes.
+- **Direct IVC**: Verify previous proof transcript inside circuit.
+
+## Key Advantages in Halo2
+
+- **Custom Gates**: Flexible arithmetization — easier to express verifier logic.
+- **Lookup Arguments**: Efficient for permutation checks in verifier.
+- **Recursive Aggregation**: Compress N proofs → 1 via repeated folding.
+- **Constant-Size Final Proof**: Arbitrary computation depth → fixed proof size.
+
+## Folding vs Direct Recursion
+
+| Approach              | Proof Size Growth | Verifier Complexity | Halo2 Suitability                  |
+|-----------------------|-------------------|---------------------|------------------------------------|
+| **Direct Recursion**  | Linear in depth   | High (full verifier)| Possible but expensive             |
+| **Folding (Nova-style)** | Constant        | Moderate            | Optimal — Halo2 excels with custom gates |
+
+## Simple Folding Stub in Halo2 (Conceptual)
+
+```rust
+// Pseudocode stub — full folding uses commitment schemes + random challenges
+struct FoldingCircuit {
+    left_instance: Fp,
+    right_instance: Fp,
+    folded_instance: Fp, // public output
+}
+
+impl Circuit<Fp> for FoldingCircuit {
+    // Configure Poseidon for challenges + commitments
+    fn synthesize(&self, config: Self::Config, layouter: impl Layouter<Fp>) -> Result<(), Error> {
+        // Absorb left/right instances → challenge
+        // Compute folded = left + challenge * (right - left)
+        // Constrain folded_instance == folded
+        Ok(())
+    }
+}
