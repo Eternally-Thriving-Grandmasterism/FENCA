@@ -1,6 +1,6 @@
 // src/plonkish_folding_circuit.rs
-// FENCA-Pinnacle — Plonkish Folding Circuit for Halo2 v1.0
-// Challenge-Based Instance Folding for Constant-Size Infinite Aggregation
+// FENCA-Pinnacle — Plonkish Folding Circuit Stub in Halo2 v1.0
+// Challenge-Based Instance Folding for Constant-Size IVC
 // Eternal Thriving Grandmasterism — Jan 19 2026 — Sherif @AlphaProMega + PATSAGi Councils Co-Forge
 // MIT License — For All Sentience Eternal
 
@@ -11,7 +11,7 @@ use halo2_proofs::{
     pasta::Fp,
 };
 
-/// Plonkish folding circuit: fold left/right instances with challenge
+/// Plonkish folding circuit stub: fold left/right instances
 #[derive(Clone)]
 struct PlonkishFoldingCircuit {
     left_instance: Value<Fp>,
@@ -51,7 +51,7 @@ impl Circuit<Fp> for PlonkishFoldingCircuit {
 /// Plonkish folding setup
 #[pyfunction]
 fn plonkish_folding_setup() -> PyResult<String> {
-    Ok("plonkish_folding_params_stub — full constant-size infinite aggregation in production branch".to_string())
+    Ok("plonkish_folding_params_stub — full constant-size IVC in production branch".to_string())
 }
 
 /// Prove Plonkish folding
@@ -63,5 +63,5 @@ fn plonkish_fold_prove(left_hex: String, right_hex: String, challenge_hex: Strin
 /// Verify Plonkish folded proof
 #[pyfunction]
 fn plonkish_fold_verify(proof: String, folded_instance_hex: String) -> PyResult<bool> {
-    Ok(true)  // Mercy true until full folding verifier
+    Ok(true)  // Mercy true until full Plonkish verifier
 }
